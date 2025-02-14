@@ -42,47 +42,44 @@ repositories {
 
 jarJar.enable()
 
-val minecraft_version: String by project
-val forge_version: String by project
-val mapping_channel: String by project
-val mapping_version: String by project
-val jei_version: String by project
-val geckolib_version: String by project
-val create_id: String by project
-val betterF3_id: String by project
-val clothConfigAPI_id: String by project
-val jade_id: String by project
-val justEnoughCharacters_id: String by project
-val kiwi_fileId: String by project
-val minecraft_version_range: String by project
-val forge_version_range: String by project
-val loader_version_range: String by project
-val mod_id: String by project
-val mod_name: String by project
-val mod_license: String by project
-val mod_version: String by project
-val mod_authors: String by project
-val mod_description: String by project
-val mod_group_id: String by project
+val minecraftVersion: String by project
+val forgeVersion: String by project
+val modId: String by project
+val modVersion: String by project
+val modGroupId: String by project
+
+group = modGroupId
+version = "$modVersion${getVersionMetadata()}"
+val targetJavaVersion = 17
 
 dependencies {
-    minecraft("net.minecraftforge:forge:$minecraft_version-$forge_version")
-    compileOnly(fg.deobf("mezz.jei:jei-$minecraft_version-common-api:$jei_version"))
-    compileOnly(fg.deobf("mezz.jei:jei-$minecraft_version-forge-api:$jei_version"))
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
-    implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"))
-    implementation(fg.deobf("curse.maven:create-328085:${create_id}"))
-    implementation(fg.deobf("curse.maven:BetterF3-401648:${betterF3_id}"))
-    implementation(fg.deobf("curse.maven:ClothConfigAPI-348521:${clothConfigAPI_id}"))
-    implementation(fg.deobf("curse.maven:jade-324717:${jade_id}"))
-    implementation(fg.deobf("curse.maven:just-enough-characters-250702:${justEnoughCharacters_id}"))
-    implementation(fg.deobf("curse.maven:kiwi-303657:${kiwi_fileId}"))
+    val jeiVersion: String by project
+    val geckolibVersion: String by project
+    val createId: String by project
+    val betterF3Id: String by project
+    val clothConfigAPIId: String by project
+    val jadeId: String by project
+    val justEnoughCharactersId: String by project
+    val kiwiFileId: String by project
+    minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
+    compileOnly(fg.deobf("mezz.jei:jei-$minecraftVersion-common-api:$jeiVersion"))
+    compileOnly(fg.deobf("mezz.jei:jei-$minecraftVersion-forge-api:$jeiVersion"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraftVersion}-forge:${jeiVersion}"))
+    implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraftVersion}:${geckolibVersion}"))
+    implementation(fg.deobf("curse.maven:create-328085:${createId}"))
+    implementation(fg.deobf("curse.maven:BetterF3-401648:${betterF3Id}"))
+    implementation(fg.deobf("curse.maven:ClothConfigAPI-348521:${clothConfigAPIId}"))
+    implementation(fg.deobf("curse.maven:jade-324717:${jadeId}"))
+    implementation(fg.deobf("curse.maven:just-enough-characters-250702:${justEnoughCharactersId}"))
+    implementation(fg.deobf("curse.maven:kiwi-303657:${kiwiFileId}"))
     implementation("org.apache.commons:commons-io:1.3.2")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 }
 
 minecraft {
-    mappings(mapping_channel, mapping_version)
+    val mappingChannel: String by project
+    val mappingVersion: String by project
+    mappings(mappingChannel, mappingVersion)
     enableIdeaPrepareRuns.set(true)
     copyIdeResources.set(true)
     accessTransformers(file("src/main/resources/META-INF/accesstransformer.cfg"))
@@ -94,30 +91,30 @@ minecraft {
             property("forge.logging.console.level", "debug")
 
             mods {
-                create(mod_id) {
+                create(modId) {
                     source(sourceSets.main.get())
                 }
             }
         }
 
         create("client") {
-            property("forge.enabledGameTestNamespaces", mod_id)
+            property("forge.enabledGameTestNamespaces", modId)
             args("--mixin.config=mixins.mindustry.json")
         }
 
         create("server") {
-            property("forge.enabledGameTestNamespaces", mod_id)
+            property("forge.enabledGameTestNamespaces", modId)
             args("--mixin.config=mixins.mindustry.json", "--nogui")
         }
 
         create("gameTestServer") {
-            property("forge.enabledGameTestNamespaces", mod_id)
+            property("forge.enabledGameTestNamespaces", modId)
         }
 
         create("data") {
             args(
                 "--mod",
-                mod_id,
+                modId,
                 "--all",
                 "--output",
                 file("src/generated/resources/"),
@@ -128,19 +125,14 @@ minecraft {
     }
 }
 
-val targetJavaVersion = 17
-
 sourceSets.main {
     resources {
         srcDirs("src/generated/resources")
     }
 }
 
-group = mod_group_id
-version = "$mod_version${getVersionMetadata()}"
-
 base {
-    archivesName.set(mod_id)
+    archivesName.set(modId)
 }
 
 java {
@@ -156,6 +148,14 @@ mixin {
 }
 
 tasks {
+    val modName: String by project
+    val modLicense: String by project
+    val modAuthors: String by project
+    val modDescription: String by project
+    val minecraftVersionRange: String by project
+    val forgeVersionRange: String by project
+    val loaderVersionRange: String by project
+
     withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
         options.release.set(targetJavaVersion)
@@ -168,17 +168,17 @@ tasks {
     processResources {
         val resourceTargets = mutableListOf("META-INF/mods.toml", "pack.mcmeta")
         val replaceProperties = mutableMapOf(
-            "minecraft_version" to minecraft_version,
-            "minecraft_version_range" to minecraft_version_range,
-            "forge_version" to forge_version,
-            "forge_version_range" to forge_version_range,
-            "loader_version_range" to loader_version_range,
-            "mod_id" to mod_id,
-            "mod_name" to mod_name,
-            "mod_license" to mod_license,
-            "mod_version" to mod_version,
-            "mod_authors" to mod_authors,
-            "mod_description" to mod_description
+            "minecraft_version" to minecraftVersion,
+            "minecraft_version_range" to minecraftVersionRange,
+            "forge_version" to forgeVersion,
+            "forge_version_range" to forgeVersionRange,
+            "loader_version_range" to loaderVersionRange,
+            "mod_id" to modId,
+            "mod_name" to modName,
+            "mod_license" to modLicense,
+            "mod_version" to modVersion,
+            "mod_authors" to modAuthors,
+            "mod_description" to modDescription
         )
 
         inputs.properties(replaceProperties)
@@ -201,11 +201,11 @@ tasks {
                         "(${System.getProperty("java.vendor")} ${System.getProperty("java.vm.version")})",
                 "Build-OS" to "${System.getProperty("os.name")} " +
                         "${System.getProperty("os.arch")} ${System.getProperty("os.version")}",
-                "Specification-Title" to mod_id,
-                "Specification-Vendor" to mod_authors,
+                "Specification-Title" to modId,
+                "Specification-Vendor" to modAuthors,
                 "Specification-Version" to "1",
                 "Implementation-Title" to project.name,
-                "Implementation-Vendor" to mod_authors,
+                "Implementation-Vendor" to modAuthors,
                 "MixinConfigs" to "mixins.mindustry.json",
                 "FMLAT" to "accesstransformer.cfg"
             )
