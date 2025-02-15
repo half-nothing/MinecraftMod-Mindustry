@@ -11,17 +11,26 @@ import com.hechu.mindustry.config.CommonConfig;
 import com.hechu.mindustry.config.ConfigHandler;
 import com.hechu.mindustry.kiwi.BlockEntityModule;
 import com.hechu.mindustry.kiwi.EntityModule;
+import com.hechu.mindustry.multiblock.BlastFurnaceRotatableMultiBlock;
+import com.hechu.mindustry.multiblock.MultiBlock;
+import com.hechu.mindustry.multiblock.MultiBlockRegistry;
 import com.hechu.mindustry.utils.Utils;
 import com.hechu.mindustry.world.entity.turrets.Duo;
 import com.hechu.mindustry.world.entity.turrets.DuoRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import software.bernie.geckolib.GeckoLib;
+
+import static com.hechu.mindustry.MindustryConstants.logger;
 
 @Mod(MindustryConstants.MOD_ID)
 public class Mindustry {
@@ -44,8 +53,21 @@ public class Mindustry {
 //        BlockEntityRegister.BLOCK_ENTITIES.register(modEventBus);
 
 //        CreativeModeTabRegister.CREATIVE_MODE_TABS.register(modEventBus);
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        modBus.addListener(this::commonSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            logger.info("Common Setup");
+            // 注册测试用多方块结构
+            ResourceLocation testStructureId = new ResourceLocation(MindustryConstants.MOD_ID, "test_structure");
+            MultiBlock testStructure = new BlastFurnaceRotatableMultiBlock();
+            MultiBlockRegistry.register(testStructureId, testStructure);
+        });
     }
 
     @Mod.EventBusSubscriber(modid = MindustryConstants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

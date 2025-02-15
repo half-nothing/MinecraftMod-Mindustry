@@ -12,7 +12,18 @@ plugins {
 
 buildscript {
     repositories {
+        maven("https://maven.aliyun.com/repository/gradle-plugin/")
         maven("https://repo.spongepowered.org/repository/maven-public/")
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("libs.versions.toml"))
+        }
     }
 }
 
