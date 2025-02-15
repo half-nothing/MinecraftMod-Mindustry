@@ -1,0 +1,14 @@
+[versions]
+kotlin-core = "2.1.10"
+detekt = "1.23.7"
+
+[libraries]
+detekt = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
+[bundles]
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-core" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+git-hooks = { id = "com.github.jakemarsden.git-hooks", version = "0.0.2" }
+shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }

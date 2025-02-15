@@ -5,9 +5,10 @@ import java.util.*
 
 plugins {
     idea
-    kotlin("jvm") version "2.1.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.7"
-    id("com.github.jakemarsden.git-hooks") version "0.0.2"
+    java
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.git.hooks)
     id("net.minecraftforge.gradle") version "[6.0,6.2)"
     id("org.parchmentmc.librarian.forgegradle") version "1.+"
     id("org.spongepowered.mixin") version "0.7.+"
@@ -36,6 +37,12 @@ repositories {
             includeGroup("curse.maven")
         }
     }
+    maven("https://thedarkcolour.github.io/KotlinForForge/") {
+        name = "Kotlin for Forge"
+        content {
+            includeGroup("thedarkcolour")
+        }
+    }
     mavenLocal()
     mavenCentral()
 }
@@ -61,18 +68,25 @@ dependencies {
     val jadeId: String by project
     val justEnoughCharactersId: String by project
     val kiwiFileId: String by project
+    val kffVersion: String by project
+
+    detektPlugins(libs.detekt)
+
     minecraft("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
+    implementation("thedarkcolour:kotlinforforge:$kffVersion")
+
     compileOnly(fg.deobf("mezz.jei:jei-$minecraftVersion-common-api:$jeiVersion"))
     compileOnly(fg.deobf("mezz.jei:jei-$minecraftVersion-forge-api:$jeiVersion"))
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraftVersion}-forge:${jeiVersion}"))
-    implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraftVersion}:${geckolibVersion}"))
-    implementation(fg.deobf("curse.maven:create-328085:${createId}"))
-    implementation(fg.deobf("curse.maven:BetterF3-401648:${betterF3Id}"))
-    implementation(fg.deobf("curse.maven:ClothConfigAPI-348521:${clothConfigAPIId}"))
-    implementation(fg.deobf("curse.maven:jade-324717:${jadeId}"))
-    implementation(fg.deobf("curse.maven:just-enough-characters-250702:${justEnoughCharactersId}"))
-    implementation(fg.deobf("curse.maven:kiwi-303657:${kiwiFileId}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraftVersion}-forge:$jeiVersion"))
+    implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-$minecraftVersion:$geckolibVersion"))
+    implementation(fg.deobf("curse.maven:create-328085:$createId"))
+    implementation(fg.deobf("curse.maven:BetterF3-401648:$betterF3Id"))
+    implementation(fg.deobf("curse.maven:ClothConfigAPI-348521:$clothConfigAPIId"))
+    implementation(fg.deobf("curse.maven:jade-324717:$jadeId"))
+    implementation(fg.deobf("curse.maven:just-enough-characters-250702:$justEnoughCharactersId"))
+    implementation(fg.deobf("curse.maven:kiwi-303657:$kiwiFileId"))
     implementation("org.apache.commons:commons-io:1.3.2")
+
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 }
 
